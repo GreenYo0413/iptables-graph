@@ -2,6 +2,7 @@
 import sys
 import re
 import string
+import html
 
 all_chains = {	'raw':	    {'PREROUTING':list(), 'OUTPUT':list()},
         'filter':   {'INPUT':list(), 'OUTPUT':list(), 'FORWARD':list()},
@@ -15,6 +16,8 @@ line_list = input_string.splitlines()
 current_table = None
 for line in line_list:
     token_list = line.split()
+    if len(token_list) == 0:
+        continue
     if token_list[0][1:] in all_chains.keys():
         current_table = token_list[0][1:]
         continue
@@ -57,18 +60,18 @@ for table in all_chains:
         tmp_body = node_name + """ [label=<<table border="0" cellborder="1" cellspacing="0">"""
         if chain in defualt_chain_list:
             tmp_body +="""
-  <tr><td bgcolor="red"><i>""" + chain + """</i></td></tr>
-  <tr><td port="begin" bgcolor="tomato"><i>""" + table + """</i></td></tr>"""
+  <tr><td bgcolor="red"><i>""" + html.escape(chain) + """</i></td></tr>
+  <tr><td port="begin" bgcolor="tomato"><i>""" + html.escape(table) + """</i></td></tr>"""
         else:
             tmp_body +="""
-  <tr><td><i>""" + chain + """</i></td></tr>
-  <tr><td port="begin"><i>""" + table + """</i></td></tr>"""
+  <tr><td><i>""" + html.escape(chain) + """</i></td></tr>
+  <tr><td port="begin"><i>""" + html.escape(table) + """</i></td></tr>"""
         for i in range(len(all_chains[table][chain])):
             rule = all_chains[table][chain][i]
             tmp_body += """
   <tr><td port="""
-            tmp_body += "\"" + get_port_name(i) + "\""
-            tmp_body += """>""" + rule["rule_body"] + """</td></tr>"""
+            tmp_body += "\"" + html.escape(get_port_name(i)) + "\""
+            tmp_body += """>""" + html.escape(rule["rule_body"]) + """</td></tr>"""
             #tmp_body += """></td></tr>"""
         tmp_body += """
   <tr><td port="end">end</td></tr>
